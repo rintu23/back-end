@@ -24,7 +24,18 @@ const productSchema = new mongoose.Schema({
     discription:{
         require:true,
         type:String,
-    }
+    },
+    reviews:[
+        {
+            review: {
+                type: String
+            },
+            username:{
+                type: String
+            }
+        }
+    ]
+   
 })
 
 const productModel = mongoose.model('productModel',productSchema)

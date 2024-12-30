@@ -1,4 +1,5 @@
 const productModel = require("../Models/productmodel")
+const userModel = require("../Models/usermodel")
 
 exports.addproduct = async(req,res)=>{
 
@@ -83,8 +84,18 @@ exports.editproduct = async(req,res)=>{
 
 exports.getcategory = async(req,res)=>{
     const {category} = req.params
+    const searchKey = req.query.search;
+    
+
+    const query = {
+        category,
+    }
+    if (searchKey) {
+        query.productname = { $regex: searchKey, $options: "i" }
+    }
+    
     try{
-    const products = await productModel.find({category})
+    const products = await productModel.find(query)
     res.status(200).send(products)
     } catch (error) {
         res.status(500).send('Internal server error')
@@ -92,3 +103,70 @@ exports.getcategory = async(req,res)=>{
         
     }
 }
+
+exports.getProductDetails = async(req,res)=>{
+    const {id} = req.params
+try{
+    const productdetails = await productModel.findById(id)
+    res.status(200).send(productdetails)
+} catch(error){
+    res.status(500).send('internal server error')
+    console.log(error); 
+} 
+}
+
+
+// exports.review = async (req,res)=>{
+//     const {review,ProductID} = req.body
+//     const id = req.payload
+
+//     console.log(review);
+    
+//   try{
+//     const userDetails = await userModel.findById(id)
+
+//     const product = await productModel.findById(ProductID)
+
+//     product.reviews.push({review,username:userDetails.name})
+
+//     await product.save()
+
+//     res.status(200).send(product)
+//   } catch (error) {
+//     res.status(500).send('internal server error')
+//     console.log(error); 
+//   }
+// }
+
+exports.review = async (req, res) => {
+    const { review, ProductID } = req.body;
+    const id = req.payload;
+  
+    console.log(review);
+  
+    try {
+      // Find user details
+      const userDetails = await userModel.findById(id);
+      if (!userDetails) {
+        return res.status(404).send({ message: "User not found" });
+      }
+  
+      // Find product by ID
+      const product = await productModel.findById(ProductID);
+      if (!product) {
+        return res.status(404).send({ message: "Product not found" });
+      }
+  
+      // Add review to the product
+      product.reviews.push({review,username:userDetails.name});
+  
+      // Save updated product
+      await product.save();
+  
+      res.status(200).send(product);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ message: "Internal server error" });
+    }
+  };
+  

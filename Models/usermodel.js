@@ -10,12 +10,11 @@ const Userschema = new mongoose.Schema({
         type:String
     },
     password:{
-        required:true,
         type:String
     },
     phone:{
         type:String
-    },
+    },  
     Address:{
         type:String
     },
@@ -26,6 +25,17 @@ const Userschema = new mongoose.Schema({
     role:{
         type:Number,
         default: 0
+    },
+    otpExpries:{
+        type:Date
+    },
+    isVerified:{
+        required:true,
+        type:Boolean,
+        default:false
+    },
+    otp:{
+        type:String
     }
 })
 const userModel = mongoose.model('usermodel',Userschema)
